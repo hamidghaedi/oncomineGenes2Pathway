@@ -12,12 +12,16 @@ AKT1, AKT2, AKT3, ALK, AR, ARAF, AXL, BRAF, BTK, CBL, CCND1, CDK4, CDK6, CHEK2, 
 
 ARID1A, ATM, ATR, ATRX, BAP1, BRCA1, BRCA2, CDK12, CDKN1B, CDKN2A, CDKN2B, CHEK1, CREBBP, FANCA, FANCD2, FANCI, FBXW7, MLH1, MRE11, MSH6, MSH2, NBN, NF1, NF2, NOTCH1, NOTCH2, NOTCH3, PALB2, PIK3R1, PMS2, POLE, PTCH1, PTEN, RAD50, RAD51, RAD51B, RAD51C, RAD51D, RNF43, RB1, SETD2, SLX4, SMARCA4, SMARCB1, STK11, TP53, TSC1, TSC2
 
+I use the Broad institute  gene list called as MSigDB Collections to mapp genes to :
+
+1. Hallmark pathways
+2. oncogenic signature gene sets
+
+
 ```r
 # loading packages
 library(org.Hs.eg.db)
-library(dplyr)
-library(tidyr)
-library(jsonlite)
+library(tidyverse)
 library(clusterProfiler)
 
 
@@ -48,11 +52,24 @@ gene.df <- bitr(geneList , fromType = "SYMBOL",
         toType = c("ENTREZID", "SYMBOL"),
         OrgDb = org.Hs.eg.db)
 # changing column type
-gene.df$ENTREZID = as.double(gene.df$ENTREZID)
-
-# joining two dfs:
-keggPathways = left_join(gene.df, gen2path)
+gene.df$ENTREZID = as.character(gene.df$ENTREZID)
 
 
+pathways.hallmark <- fgsea::gmtPathways("~/mysigdb/h.all.v7.2.symbols.gmt")
+# converting to a dataframe
+pathways.hallmark <- plyr::ldply (pathways.hallmark, data.frame)
+# naming the columns
+colnames(pathways.hallmark) <- c("pathName", "ENTREZID")
+
+oncoSig.pathways <- fgsea::gmtPathways("~/mysigdb/c6.all.v7.2.")
+# converting to a dataframe
+oncoSig.pathways <- plyr::ldply (oncoSig.pathways, data.frame)
+# naming the columns
+colnames(oncoSig.pathways) <- c("oncSigPathName", "ENTREZID")
+
+# joing incomine genes with hallmark pathways
+ocavHallmarkPath = dplyr::left_join(gene.df, pathways.hallmark)
+ocavOncoSingPath = dplyr::left_join(gene.df, oncoSig.pathways)
 ```
+
 
