@@ -53,15 +53,15 @@ gene.df <- bitr(geneList , fromType = "SYMBOL",
         OrgDb = org.Hs.eg.db)
 # changing column type
 gene.df$ENTREZID = as.character(gene.df$ENTREZID)
+    
 
-
-pathways.hallmark <- fgsea::gmtPathways("~/mysigdb/h.all.v7.2.symbols.gmt")
+pathways.hallmark <- fgsea::gmtPathways("~/mysigdb/h.all.v7.2.entrez.gmt")
 # converting to a dataframe
 pathways.hallmark <- plyr::ldply (pathways.hallmark, data.frame)
 # naming the columns
 colnames(pathways.hallmark) <- c("pathName", "ENTREZID")
 
-oncoSig.pathways <- fgsea::gmtPathways("~/mysigdb/c6.all.v7.2.")
+oncoSig.pathways <- fgsea::gmtPathways("~/mysigdb/c6.all.v7.2.entrez.gmt")
 # converting to a dataframe
 oncoSig.pathways <- plyr::ldply (oncoSig.pathways, data.frame)
 # naming the columns
@@ -70,6 +70,6 @@ colnames(oncoSig.pathways) <- c("oncSigPathName", "ENTREZID")
 # joing incomine genes with hallmark pathways
 ocavHallmarkPath = dplyr::left_join(gene.df, pathways.hallmark)
 ocavOncoSingPath = dplyr::left_join(gene.df, oncoSig.pathways)
-```
 
+```
 
